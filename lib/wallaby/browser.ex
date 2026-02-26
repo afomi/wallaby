@@ -231,13 +231,10 @@ defmodule Wallaby.Browser do
 
   ## Full Page Screenshots
 
-  When `full_page: true` is specified:
-  - Chrome: Uses Chrome DevTools Protocol (CDP) for native fullpage capture
-  - Firefox: Uses GeckoDriver's Moz-specific fullpage screenshot endpoint
-
-  Full page screenshots capture the entire document, including content outside the viewport.
-  This is useful for capturing long pages without scrolling or stitching multiple screenshots.
-  Both implementations use native browser APIs for accurate rendering.
+  When `full_page: true` is specified, the entire document is captured including content
+  outside the viewport. Supported drivers:
+  - ChromeDriver (Chrome)
+  - GeckoDriver 0.16.0+ (Firefox via Selenium)
   """
   @type take_screenshot_opt :: {:name, String.t()} | {:log, boolean} | {:full_page, boolean}
   @spec take_screenshot(parent, [take_screenshot_opt]) :: parent

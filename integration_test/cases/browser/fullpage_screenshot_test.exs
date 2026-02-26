@@ -19,18 +19,24 @@ defmodule Wallaby.Integration.Browser.FullpageScreenshotTest do
     ensure_setting_is_reset(:wallaby, :screenshot_dir)
     Application.put_env(:wallaby, :screenshot_dir, screenshots_path)
 
-    [path] =
-      page
-      |> take_screenshot(name: "fullpage_test", full_page: true)
-      |> Map.get(:screenshots)
+    assert [viewport_path] =
+             page
+             |> take_screenshot(name: "viewport_test")
+             |> Map.get(:screenshots)
 
-    assert_in_directory(path, screenshots_path)
-    assert Path.basename(path) == "fullpage_test.png"
-    assert_file_exists(path)
+    assert [fullpage_path] =
+             page
+             |> take_screenshot(name: "fullpage_test", full_page: true)
+             |> Map.get(:screenshots)
 
-    # Verify the file is a valid PNG by checking the PNG signature
-    {:ok, file_content} = File.read(path)
-    <<0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, _rest::binary>> = file_content
+    assert_in_directory(fullpage_path, screenshots_path)
+    assert Path.basename(fullpage_path) == "fullpage_test.png"
+    assert_file_exists(fullpage_path)
+
+    viewport_size = File.stat!(viewport_path).size
+    fullpage_size = File.stat!(fullpage_path).size
+
+    assert fullpage_size >= viewport_size
   end
 
   test "fullpage screenshot option defaults to false", %{page: page} do
@@ -40,8 +46,8 @@ defmodule Wallaby.Integration.Browser.FullpageScreenshotTest do
     Application.put_env(:wallaby, :screenshot_dir, screenshots_path)
 
     # Both of these should work the same way (viewport screenshot)
-    [path1] = page |> take_screenshot(name: "test1") |> Map.get(:screenshots)
-    [path2] = page |> take_screenshot(name: "test2", full_page: false) |> Map.get(:screenshots)
+    assert [path1] = page |> take_screenshot(name: "test1") |> Map.get(:screenshots)
+    assert [path2] = page |> take_screenshot(name: "test2", full_page: false) |> Map.get(:screenshots)
 
     assert_file_exists(path1)
     assert_file_exists(path2)
