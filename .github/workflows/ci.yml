@@ -19,13 +19,13 @@ jobs:
       OTP_VERSION: ${{ matrix.elixir-otp.otp }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: erlef/setup-beam@v1
       with:
         otp-version: ${{matrix.elixir-otp.otp}}
         elixir-version: ${{matrix.elixir-otp.elixir}}
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: cache
       with:
         path: deps
@@ -50,19 +50,19 @@ jobs:
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: erlef/setup-beam@v1
       with:
         otp-version: ${{matrix.elixir-otp.otp}}
         elixir-version: ${{matrix.elixir-otp.elixir}}
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: deps-cache
       with:
         path: deps
         key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       with:
         path: _build
         key: ${{ runner.os }}-v1-dialyzer-${{matrix.elixir-otp.otp}}-${{ matrix.elixir-otp.elixir }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
@@ -99,13 +99,13 @@ jobs:
       OTP_VERSION: ${{ matrix.elixir-otp.otp }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: erlef/setup-beam@v1
       with:
         otp-version: ${{matrix.elixir-otp.otp}}
         elixir-version: ${{matrix.elixir-otp.elixir}}
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: cache
       with:
         path: deps
@@ -136,13 +136,13 @@ jobs:
       OTP_VERSION: ${{ matrix.elixir-otp.otp }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: erlef/setup-beam@v1
       with:
         otp-version: ${{matrix.elixir-otp.otp}}
         elixir-version: ${{matrix.elixir-otp.elixir}}
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: cache
       with:
         path: deps
@@ -160,7 +160,7 @@ jobs:
     - name: Run Tests
       run: mix test || mix test --failed || mix test --failed
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       if: always()
       with:
         name: Selenium Logs (Elixir ${{matrix.elixir-otp.elixir}})
@@ -182,13 +182,13 @@ jobs:
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: erlef/setup-beam@v1
       with:
         otp-version: ${{matrix.elixir-otp.otp}}
         elixir-version: ${{matrix.elixir-otp.elixir}}
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: cache
       with:
         path: deps
@@ -207,7 +207,7 @@ jobs:
     - name: Run Tests
       run: mix test || mix test --failed || mix test --failed
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       if: always()
       with:
         name: Selenium Logs Selenium 4 Linux
@@ -224,11 +224,11 @@ jobs:
       WALLABY_DRIVER: selenium
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - run: brew install erlang elixir
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: cache
       with:
         path: deps
@@ -247,7 +247,7 @@ jobs:
     - name: Run Tests
       run: mix test || mix test --failed || mix test --failed
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       if: always()
       with:
         name: Selenium Logs Selenium 4 Mac

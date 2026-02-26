@@ -20,7 +20,7 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: ${{ steps.release.outputs.release_created }}
 
       - uses: erlef/setup-beam@v1
@@ -30,7 +30,7 @@ jobs:
           elixir-version: ${{matrix.elixir}}
         if: ${{ steps.release.outputs.release_created }}
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: cache
         if: ${{ steps.release.outputs.release_created }}
         with:
