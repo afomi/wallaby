@@ -403,12 +403,7 @@ defmodule Wallaby.WebdriverClient do
     end
   end
 
-  @doc """
-  Executes a Chrome DevTools Protocol (CDP) command.
-  Only works with ChromeDriver.
-  """
-  @spec execute_cdp(Session.t(), String.t(), map) :: {:ok, any} | {:error, any}
-  def execute_cdp(session, command, params \\ %{}) do
+  defp execute_cdp(session, command, params \\ %{}) do
     request_params = %{
       cmd: command,
       params: params
