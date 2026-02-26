@@ -545,7 +545,7 @@ defmodule Wallaby.Chrome do
   @doc false
   def take_fullpage_screenshot(session_or_element) do
     check_logs!(session_or_element, fn ->
-      WebdriverClient.take_fullpage_screenshot_cdp(session_or_element)
+      WebdriverClient.take_fullpage_screenshot(session_or_element)
     end)
   end
 
