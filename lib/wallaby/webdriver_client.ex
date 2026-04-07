@@ -21,9 +21,35 @@ defmodule Wallaby.WebdriverClient do
   """
   @spec create_session(String.t(), map) :: {:ok, map}
   def create_session(base_url, capabilities) do
-    params = %{desiredCapabilities: capabilities}
+    params =
+      case Map.get(capabilities, :chromeOptions) do
+        nil ->
+          # Non-Chrome driver (e.g. Selenium/Firefox) — use legacy format only
+          %{desiredCapabilities: capabilities}
 
-    request(:post, "#{base_url}session", params)
+        chrome_opts ->
+          # Chrome driver — send both W3C and legacy formats.
+          # Chromedriver 97+ requires W3C; older versions use desiredCapabilities.
+          %{
+            capabilities: %{
+              alwaysMatch: %{
+                "goog:chromeOptions" => chrome_opts,
+                "unhandledPromptBehavior" =>
+                  Map.get(capabilities, :unhandledPromptBehavior, "accept")
+              }
+            },
+            desiredCapabilities: capabilities
+          }
+      end
+
+    case request(:post, "#{base_url}session", params) do
+      {:ok, %{"value" => %{"sessionId" => _} = value}} ->
+        # W3C response nests sessionId under "value"
+        {:ok, value}
+
+      other ->
+        other
+    end
   end
 
   @doc """

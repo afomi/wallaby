@@ -7,18 +7,20 @@ defmodule Wallaby.WebdriverClientTest do
   @web_element_identifier "element-6066-11e4-a52e-4f735466cecf"
 
   describe "create_session/2" do
-    test "sends the correct request to the webdriver backend", %{bypass: bypass} do
+    test "sends W3C and legacy capabilities to the webdriver backend", %{bypass: bypass} do
       base_url = bypass_url(bypass) <> "/"
       new_session_id = "abc123"
 
       capabilities = %{
-        "platform" => "OS X",
-        "browser" => "chrome"
+        chromeOptions: %{args: ["--headless"]},
+        unhandledPromptBehavior: "accept"
       }
 
       Bypass.expect(bypass, "POST", "/session", fn conn ->
         conn = parse_body(conn)
-        assert %{"desiredCapabilities" => capabilities} == conn.body_params
+        # Sends both W3C and legacy formats
+        assert conn.body_params["desiredCapabilities"]
+        assert conn.body_params["capabilities"]["alwaysMatch"]["goog:chromeOptions"]
 
         send_json_resp(conn, 200, %{
           "sessionId" => "#{new_session_id}",
@@ -26,6 +28,30 @@ defmodule Wallaby.WebdriverClientTest do
           "value" => %{
             "acceptSslCerts" => false,
             "browserName" => "chrome"
+          }
+        })
+      end)
+
+      assert {:ok, response} = Client.create_session(base_url, capabilities)
+      assert %{"sessionId" => ^new_session_id} = response
+    end
+
+    test "unwraps W3C response format", %{bypass: bypass} do
+      base_url = bypass_url(bypass) <> "/"
+      new_session_id = "w3c-session-456"
+
+      capabilities = %{
+        chromeOptions: %{args: ["--headless"]}
+      }
+
+      Bypass.expect(bypass, "POST", "/session", fn conn ->
+        conn = parse_body(conn)
+
+        # W3C response nests sessionId under "value"
+        send_json_resp(conn, 200, %{
+          "value" => %{
+            "sessionId" => new_session_id,
+            "capabilities" => %{"browserName" => "chrome"}
           }
         })
       end)
