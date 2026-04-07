@@ -466,29 +466,33 @@ defmodule Wallaby.WebdriverClient do
   end
 
   @doc """
-  Sets the size of the window
+  Sets the size of the window.
+  Uses W3C /window/rect endpoint.
   """
   @spec set_window_size(parent, non_neg_integer, non_neg_integer) :: {:ok, map}
   def set_window_size(session, width, height) do
     params = %{width: width, height: height}
 
-    with {:ok, resp} <- request(:post, "#{session.url}/window/current/size", params) do
+    with {:ok, resp} <- request(:post, "#{session.url}/window/rect", params) do
       Map.fetch(resp, "value")
     end
   end
 
   @doc """
-  Gets the size of the window
+  Gets the size of the window.
+  Uses W3C /window/rect endpoint.
   """
   @spec get_window_size(parent) :: {:ok, map}
   def get_window_size(session) do
-    with {:ok, resp} <- request(:get, "#{session.url}/window/current/size") do
-      Map.fetch(resp, "value")
+    with {:ok, resp} <- request(:get, "#{session.url}/window/rect") do
+      {:ok, value} = Map.fetch(resp, "value")
+      {:ok, Map.take(value, ["width", "height"])}
     end
   end
 
   @doc """
-  Changes the position of the window
+  Changes the position of the window.
+  Uses W3C /window/rect endpoint.
   """
   @spec set_window_position(parent, non_neg_integer, non_neg_integer) :: {:ok, map}
   def set_window_position(session, x_coordinate, y_coordinate) do
@@ -497,27 +501,30 @@ defmodule Wallaby.WebdriverClient do
       y: y_coordinate
     }
 
-    with {:ok, resp} <- request(:post, "#{session.url}/window/current/position", params) do
+    with {:ok, resp} <- request(:post, "#{session.url}/window/rect", params) do
       Map.fetch(resp, "value")
     end
   end
 
   @doc """
-  Gets the position of the window
+  Gets the position of the window.
+  Uses W3C /window/rect endpoint.
   """
   @spec get_window_position(parent) :: {:ok, map}
   def get_window_position(session) do
-    with {:ok, resp} <- request(:get, "#{session.url}/window/current/position") do
-      Map.fetch(resp, "value")
+    with {:ok, resp} <- request(:get, "#{session.url}/window/rect") do
+      {:ok, value} = Map.fetch(resp, "value")
+      {:ok, Map.take(value, ["x", "y"])}
     end
   end
 
   @doc """
-  Maximizes the window if not already maximized
+  Maximizes the window if not already maximized.
+  Uses W3C /window/maximize endpoint.
   """
   @spec maximize_window(parent) :: {:ok, map}
   def maximize_window(session) do
-    with {:ok, resp} <- request(:post, "#{session.url}/window/current/maximize") do
+    with {:ok, resp} <- request(:post, "#{session.url}/window/maximize") do
       Map.fetch(resp, "value")
     end
   end
@@ -578,9 +585,17 @@ defmodule Wallaby.WebdriverClient do
   """
   @spec log(Session.t() | Element.t()) :: {:ok, [map]}
   def log(session) do
-    with {:ok, resp} <- request(:post, "#{session.session_url}/log", %{type: "browser"}) do
-      Map.fetch(resp, "value")
+    case request(:post, "#{session.session_url}/log", %{type: "browser"}) do
+      {:ok, resp} ->
+        Map.fetch(resp, "value")
+
+      {:error, _} ->
+        # /log is not available in W3C mode
+        {:ok, []}
     end
+  rescue
+    # W3C chromedriver raises "unknown command" for the legacy /log endpoint
+    _ -> {:ok, []}
   end
 
   @doc """

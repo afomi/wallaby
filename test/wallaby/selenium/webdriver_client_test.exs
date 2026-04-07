@@ -695,7 +695,7 @@ defmodule Wallaby.WebdriverClientTest do
       height = 600
       width = 400
 
-      Bypass.expect(bypass, "POST", "/session/#{session.id}/window/current/size", fn conn ->
+      Bypass.expect(bypass, "POST", "/session/#{session.id}/window/rect", fn conn ->
         conn = parse_body(conn)
         assert conn.body_params == %{"height" => height, "width" => width}
 
@@ -714,11 +714,13 @@ defmodule Wallaby.WebdriverClientTest do
     test "sends the correct request to the server", %{bypass: bypass} do
       session = build_session_for_bypass(bypass)
 
-      Bypass.expect(bypass, "GET", "/session/#{session.id}/window/current/size", fn conn ->
+      Bypass.expect(bypass, "GET", "/session/#{session.id}/window/rect", fn conn ->
         send_json_resp(conn, 200, %{
           "sessionId" => session.id,
           "status" => 0,
           "value" => %{
+            "x" => 0,
+            "y" => 0,
             "height" => 600,
             "width" => 400
           }
@@ -735,7 +737,7 @@ defmodule Wallaby.WebdriverClientTest do
       x_coordinate = 600
       y_coordinate = 400
 
-      Bypass.expect(bypass, "POST", "/session/#{session.id}/window/current/position", fn conn ->
+      Bypass.expect(bypass, "POST", "/session/#{session.id}/window/rect", fn conn ->
         conn = parse_body(conn)
         assert conn.body_params == %{"x" => x_coordinate, "y" => y_coordinate}
 
@@ -754,13 +756,15 @@ defmodule Wallaby.WebdriverClientTest do
     test "sends the correct request to the server", %{bypass: bypass} do
       session = build_session_for_bypass(bypass)
 
-      Bypass.expect(bypass, "GET", "/session/#{session.id}/window/current/position", fn conn ->
+      Bypass.expect(bypass, "GET", "/session/#{session.id}/window/rect", fn conn ->
         send_json_resp(conn, 200, %{
           "sessionId" => session.id,
           "status" => 0,
           "value" => %{
             "x" => 600,
-            "y" => 400
+            "y" => 400,
+            "width" => 1280,
+            "height" => 800
           }
         })
       end)
@@ -773,7 +777,7 @@ defmodule Wallaby.WebdriverClientTest do
     test "sends the correct request to the server", %{bypass: bypass} do
       session = build_session_for_bypass(bypass)
 
-      Bypass.expect(bypass, "POST", "/session/#{session.id}/window/current/maximize", fn conn ->
+      Bypass.expect(bypass, "POST", "/session/#{session.id}/window/maximize", fn conn ->
         send_json_resp(conn, 200, %{
           "sessionId" => session.id,
           "status" => 0,
