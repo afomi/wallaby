@@ -574,7 +574,7 @@ defmodule Wallaby.WebdriverClient do
   def execute_script(session, script, arguments \\ []) do
     params = %{script: script, args: arguments}
 
-    with {:ok, resp} <- request(:post, "#{session.session_url}/execute", params) do
+    with {:ok, resp} <- request(:post, "#{session.session_url}/execute/sync", params) do
       Map.fetch(resp, "value")
     end
   end
@@ -590,7 +590,7 @@ defmodule Wallaby.WebdriverClient do
       args: arguments
     }
 
-    with {:ok, resp} <- request(:post, "#{session.session_url}/execute_async", params) do
+    with {:ok, resp} <- request(:post, "#{session.session_url}/execute/async", params) do
       Map.fetch(resp, "value")
     end
   end

@@ -793,7 +793,7 @@ defmodule Wallaby.WebdriverClientTest do
     test "sends the correct request to the server", %{bypass: bypass} do
       session = build_session_for_bypass(bypass)
 
-      Bypass.expect(bypass, "POST", "/session/#{session.id}/execute", fn conn ->
+      Bypass.expect(bypass, "POST", "/session/#{session.id}/execute/sync", fn conn ->
         conn = parse_body(conn)
         assert conn.body_params == %{"script" => "localStorage.clear()", "args" => [2, "a"]}
 
